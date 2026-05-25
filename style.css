@@ -880,10 +880,16 @@ body {
   }
 }
 
-@media (max-width: 480px) {
-  /* Remplace '.titre' par la vraie classe ou l'identifiant de ton titre (ex: h1, ou #nom-du-titre) */
-  h1, .titre-plakoto {
-    font-size: 1.8rem; /* Ajuste cette valeur (ex: 24px ou 1.5rem) pour que le texte rétrécisse juste ce qu'il faut */
-    letter-spacing: -1px; /* Rapproche un peu les lettres si besoin */
-  }
+
+
+/* Cette règle cible directement le titre Plakoto sur mobile */
+@media (max-width: 600px) {
+    h1, .titre, [class*="titre"], [id*="titre"] {
+        font-size: 24px !important;      /* Réduit la taille des lettres */
+        max-width: fit-content !important; /* Force le titre à ne pas s'étaler */
+        margin-left: auto !important;    /* Centre parfaitement à gauche */
+        margin-right: auto !important;   /* Centre parfaitement à droite */
+        padding: 0 10px !important;      /* Donne un petit espace de sécurité */
+        display: block !important;
+    }
 }
