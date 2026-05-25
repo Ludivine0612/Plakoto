@@ -866,19 +866,27 @@ header::after {
   }
 }
 
-/* LE RECADRAGE MAGIQUE DU DRAPEAU ET DU TITRE SUR SMARTPHONE */
 @media (max-width: 600px) {
   header {
-    padding: 0 !important;         /* Retire les gros espaces du haut/bas */
-    height: 70px !important;       /* Fixe une hauteur de drapeau très compacte */
+    padding: 0 !important;
+    height: 75px !important;
   }
 
   header h1 {
-    font-size: 24px !important;    /* Force le titre à rétrécir enfin ! */
-    line-height: 70px !important;  /* Aligne le texte au milieu pile de la bande blanche */
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+    color: #00209b !important;
+    /* Création du cartouche blanc propre */
+    background: rgba(255, 255, 255, 0.95) !important;
+    padding: 4px 16px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+    
+    /* Permet au titre de respirer sans casser le drapeau */
+    display: inline-block !important;
   }
 
   header p {
-    display: none !important;      /* Masque les sous-titres éventuels pour gagner de la place */
+    display: none !important;
   }
 }
