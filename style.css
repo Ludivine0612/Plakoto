@@ -886,3 +886,23 @@ body {
         font-size: 20px !important;
     }
 }
+
+/* Ajustement du drapeau pour les écrans de smartphones */
+@media (max-width: 600px) {
+    /* On cible l'élément qui affiche ton drapeau (ajuste le nom si nécessaire, ex: .banner, header, ou .flag) */
+    header, .flag-container, .banner {
+        height: 80px !important;       /* Force une hauteur plus petite et fixe */
+        background-size: cover !important; /* Force le drapeau à bien se caler dans ces 80px */
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important; /* Aligne le titre parfaitement au milieu verticalement */
+        justify-content: center !important;
+    }
+
+    /* On s'assure que le titre en profite pour bien se positionner */
+    h1 {
+        font-size: 22px !important;
+        margin: 0 !important;
+        line-height: 80px !important; /* Aligne le texte sur la hauteur du drapeau */
+    }
+}
