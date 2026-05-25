@@ -879,3 +879,11 @@ body {
     margin-right: 12px;
   }
 }
+
+@media (max-width: 480px) {
+  /* Remplace '.titre' par la vraie classe ou l'identifiant de ton titre (ex: h1, ou #nom-du-titre) */
+  h1, .titre-plakoto {
+    font-size: 1.8rem; /* Ajuste cette valeur (ex: 24px ou 1.5rem) pour que le texte rétrécisse juste ce qu'il faut */
+    letter-spacing: -1px; /* Rapproche un peu les lettres si besoin */
+  }
+}
