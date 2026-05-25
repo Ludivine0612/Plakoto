@@ -28,6 +28,7 @@ body {
   padding: 0 0 40px 0;
   color: var(--text);
   overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent; /* Intégré ici pour éviter les parasites tactiles */
 }
 
 /* HEADER */
@@ -46,16 +47,17 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.3s ease;
 }
 
 header h1 {
-  font-family: 'Baloo 2', cursive !important;
-  font-size: 3.2rem !important;
-  font-weight: 800 !important;
-  color: #00209b !important; 
-  margin: 0 !important;
+  font-family: 'Baloo 2', cursive;
+  font-size: 3.2rem; /* Retrait du !important ici pour laisser le responsive fonctionner */
+  font-weight: 800;
+  color: #00209b; 
+  margin: 0;
   letter-spacing: -0.5px;
-  text-shadow: none !important; 
+  text-shadow: none; 
 }
 
 header p {
@@ -791,18 +793,11 @@ header::after {
   100% { transform: scale(1); opacity: 1; }
 }
 
-
-/* ==========================================================================
-   1. VERROUILLAGE DE LA CARTE (AUCUN CLIC AUTORISÉ VISUELLEMENT)
-   ========================================================================== */
-
 .departement {
   fill: #f0f4ff !important;
   stroke: #d1d9f0 !important;
   stroke-width: 1px;
   transition: fill 0.3s ease, stroke 0.3s ease;
-  
-  /* Bloque le clic et le survol (pas de changement de couleur au passage de la souris) */
   pointer-events: none !important; 
 }
 
@@ -816,21 +811,14 @@ header::after {
   stroke: var(--yellow-dark) !important;
 }
 
-/* Ajustement pour colorer les mini-maps des DROM au format SVG */
 .drom-card.found .drom-mini-map svg path,
 .drom-card.found .drom-mini-map svg circle {
   fill: #ffffff !important;
 }
 
-
 /* ==========================================================================
-   2. RESPONSIVE DESIGN (HYBRIDE PC & SMARTPHONE)
+   2. RESPONSIVE DESIGN (NETTOYÉ ET OPTIMISÉ POUR PC & SMARTPHONE)
    ========================================================================== */
-
-/* Désactive les effets parasites du tactile sur mobile */
-body {
-  -webkit-tap-highlight-color: transparent;
-}
 
 /* ÉCRANS INTERMÉDIAIRES (TABLETTES / PETITS PC) */
 @media (max-width: 950px) {
@@ -850,7 +838,7 @@ body {
   }
 }
 
-/* ÉCRANS SMARTPHONES (MOBILES) */
+/* ÉCRANS SMARTPHONES COMPACTS */
 @media (max-width: 500px) {
   .game-layout {
     padding: 0 12px;
@@ -862,12 +850,10 @@ body {
     padding: 16px;
   }
 
-  /* On agrandit les boutons du pavé pour faciliter la saisie au pouce */
   .numpad button {
     padding: 18px 8px;
   }
 
-  /* Les DROM passent sur 3 colonnes pour ne pas être trop écrasés */
   .drom-grid {
     grid-template-columns: repeat(3, 1fr) !important;
   }
@@ -880,29 +866,19 @@ body {
   }
 }
 
-
+/* LE RECADRAGE MAGIQUE DU DRAPEAU ET DU TITRE SUR SMARTPHONE */
 @media (max-width: 600px) {
-    h1 {
-        font-size: 20px !important;
-    }
-}
+  header {
+    padding: 0 !important;         /* Retire les gros espaces du haut/bas */
+    height: 70px !important;       /* Fixe une hauteur de drapeau très compacte */
+  }
 
-/* Ajustement du drapeau pour les écrans de smartphones */
-@media (max-width: 600px) {
-    /* On cible l'élément qui affiche ton drapeau (ajuste le nom si nécessaire, ex: .banner, header, ou .flag) */
-    header, .flag-container, .banner {
-        height: 80px !important;       /* Force une hauteur plus petite et fixe */
-        background-size: cover !important; /* Force le drapeau à bien se caler dans ces 80px */
-        padding: 0 !important;
-        display: flex !important;
-        align-items: center !important; /* Aligne le titre parfaitement au milieu verticalement */
-        justify-content: center !important;
-    }
+  header h1 {
+    font-size: 24px !important;    /* Force le titre à rétrécir enfin ! */
+    line-height: 70px !important;  /* Aligne le texte au milieu pile de la bande blanche */
+  }
 
-    /* On s'assure que le titre en profite pour bien se positionner */
-    h1 {
-        font-size: 22px !important;
-        margin: 0 !important;
-        line-height: 80px !important; /* Aligne le texte sur la hauteur du drapeau */
-    }
+  header p {
+    display: none !important;      /* Masque les sous-titres éventuels pour gagner de la place */
+  }
 }
