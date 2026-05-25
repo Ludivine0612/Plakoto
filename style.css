@@ -881,27 +881,8 @@ body {
 }
 
 
-
-/* Cette règle cible directement le titre Plakoto sur mobile */
 @media (max-width: 600px) {
-    h1, .titre, [class*="titre"], [id*="titre"], .titre-principal-plakoto {
-        font-size: 20px !important;        /* Réduit la taille pour que ça tienne dans le blanc */
-        max-width: fit-content !important; /* Force le titre à ne pas baver sur les côtés */
-        margin-left: auto !important;     /* Centre à gauche */
-        margin-right: auto !important;    /* Centre à droite */
-        padding: 0 10px !important;       
-        display: block !important;
-    }
-}
-
-/* Règle universelle pour ajuster les conteneurs sur téléphones */
-@media (max-width: 480px) {
-    header, 
-    .banner,
-    .top-bar,
-    .flag-container {
-        height: auto !important;           /* Permet au drapeau de s'adapter si besoin */
-        min-height: 60px !important;
-        padding: 5px 0 !important;
+    h1 {
+        font-size: 20px !important;
     }
 }
