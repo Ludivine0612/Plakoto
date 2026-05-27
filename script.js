@@ -240,31 +240,33 @@ function addChip(key, name) {
   
   // Au clic sur le badge vert en bas
   chip.addEventListener('click', () => {
-    // 1. On va chercher l'élément qui contient ta carte (le <object> ou le <svg> directement)
+    // 1. On cherche l'élément qui contient ta carte (<object> ou <svg>)
     const objetSvg = document.getElementById('map') || document.querySelector('object');
     
-    // 2. On détermine où chercher (dans l'objet interne si c'est un <object>, ou directement dans la page)
+    // 2. On détermine où chercher (dans l'objet interne ou dans la page)
     let docCarte = document;
     if (objetSvg && objetSvg.contentDocument) {
       docCarte = objetSvg.contentDocument;
     }
 
-    // 3. On nettoie l'ancien département qui était en bleu (partout)
+    // 3. On nettoie TOUS les anciens départements qui étaient passés en bleu
     document.querySelectorAll('.selected-blue').forEach(el => el.classList.remove('selected-blue'));
-    docCarte.querySelectorAll('.selected-blue').forEach(el => el.classList.remove('selected-blue'));
+    docCarte.querySelectorAll('path').forEach(el => {
+  if (el.style.fill === 'rgb(0, 32, 155)') { // Si le département est bleu (0, 32, 155)
+    el.style.fill = ''; // On réinitialise pour qu'il reprenne sa couleur verte d'origine (.found)
+    el.style.stroke = '';
+    el.style.strokeWidth = '';
+  }
+});
 
-    // 4. On cherche le département à l'endroit précis où se trouve la carte
+    // 4. On cherche le département cliqué dans la carte SVG
     const path = docCarte.getElementById(`FR-${key}`);
     
     if (path) {
-      // 5. On lui applique enfin la classe bleue !
-      path.classList.add('selected-blue');
-      
-      // 6. On remonte l'écran automatiquement vers la carte pour voir le résultat
-      const vueCarte = document.getElementById('map') || document.querySelector('object') || document.querySelector('svg');
-      if (vueCarte) {
-        vueCarte.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      // 5. On lui applique la classe bleue !
+      path.style.fill = '#00209b'; // Applique le bleu royal directement
+path.style.stroke = '#ffffff'; // Bordure blanche
+path.style.strokeWidth = '2px';
     } else {
       console.log(`Département FR-${key} introuvable dans la carte.`);
     }
