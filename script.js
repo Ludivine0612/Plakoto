@@ -235,27 +235,38 @@ function updateScores() {
 function addChip(key, name) {
   const chip = document.createElement('div');
   chip.className = 'found-chip';
-  chip.style.cursor = 'pointer'; // Indique que le badge est cliquable
+  chip.style.cursor = 'pointer';
   chip.innerHTML = `<span class="num">${key}</span> ${name}`;
   
-  // === AJOUT : Clic sur le badge pour colorer le département en bleu ===
+  // Au clic sur le badge vert en bas
   chip.addEventListener('click', () => {
-    // 1. On commence par enlever la couleur bleue de n'importe quel autre département précédemment cliqué
-    document.querySelectorAll('.selected-blue').forEach(el => {
-      el.classList.remove('selected-blue');
-    });
+    // 1. On va chercher l'élément qui contient ta carte (le <object> ou le <svg> directement)
+    const objetSvg = document.getElementById('map') || document.querySelector('object');
+    
+    // 2. On détermine où chercher (dans l'objet interne si c'est un <object>, ou directement dans la page)
+    let docCarte = document;
+    if (objetSvg && objetSvg.contentDocument) {
+      docCarte = objetSvg.contentDocument;
+    }
 
-    // 2. On cherche le département correspondant sur la carte
-    const path = document.getElementById(`FR-${key}`);
+    // 3. On nettoie l'ancien département qui était en bleu (partout)
+    document.querySelectorAll('.selected-blue').forEach(el => el.classList.remove('selected-blue'));
+    docCarte.querySelectorAll('.selected-blue').forEach(el => el.classList.remove('selected-blue'));
+
+    // 4. On cherche le département à l'endroit précis où se trouve la carte
+    const path = docCarte.getElementById(`FR-${key}`);
+    
     if (path) {
-      // 3. On lui ajoute la classe bleue
+      // 5. On lui applique enfin la classe bleue !
       path.classList.add('selected-blue');
       
-      // 4. Optionnel : On fait un petit effet de défilement automatique vers la carte pour bien la voir
-      const carteElement = document.getElementById('map') || document.querySelector('svg');
-      if (carteElement) {
-        carteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // 6. On remonte l'écran automatiquement vers la carte pour voir le résultat
+      const vueCarte = document.getElementById('map') || document.querySelector('object') || document.querySelector('svg');
+      if (vueCarte) {
+        vueCarte.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
+    } else {
+      console.log(`Département FR-${key} introuvable dans la carte.`);
     }
   });
 
