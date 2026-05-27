@@ -192,49 +192,70 @@ function validate() {
   input.value = '';
 }
 
+// FUNCTION HIGHLIGHTMAP SÉCURISÉE
 function highlightMap(deptId) {
-  // Cette carte utilise le format "FR-01", "FR-75", "FR-2A", etc.
   const path = document.getElementById(`FR-${deptId}`);
-  
   if (path) {
     path.classList.add('found');
+    path.setAttribute('data-num', deptId); // Stocke le numéro
     
-    // AJOUT : On stocke les infos pour pouvoir les récupérer au clic
-    path.setAttribute('data-num', deptId);
-    
-    // AJOUT : Gestion du clic/tapotement du doigt sur mobile et PC
-    path.onclick = function() {
-      // On vérifie si ce département a bien été trouvé
-      if (path.classList.contains('found')) {
-        const num = path.getAttribute('data-num');
-        const deptInfo = DEPARTMENTS[num];
-        
-        if (deptInfo) {
-          // On utilise ta boîte de résultat existante pour afficher l'info !
-          const box = document.getElementById('result-box');
-          const icon = document.getElementById('result-icon');
-          const name = document.getElementById('result-name');
-          const region = document.getElementById('result-region');
-          
-          box.className = 'result-box show correct';
-          icon.textContent = '🗺️';
-          name.textContent = `${num} — ${deptInfo.name}`;
-          region.textContent = ' ' + deptInfo.region;
-          
-          // Petit effet visuel : fait clignoter rapidement le département cliqué
-          path.classList.add('highlight');
-          setTimeout(() => path.classList.remove('highlight'), 500);
-        }
-      }
-    };
-    
-    // Flash jaune temporaire à la validation initiale
     path.classList.add('highlight');
     setTimeout(() => {
       path.classList.remove('highlight');
     }, 1500);
   }
 }
+
+// RESTAURATION DE LA PARTIE
+function restaurerPartie() {
+  if (found.size > 0) {
+    found.forEach(key => {
+      highlightMap(key);
+      if (DEPARTMENTS[key]) {
+        addChip(key, DEPARTMENTS[key].name);
+      }
+    });
+    updateScores();
+  }
+}
+
+// === L'ÉCOUTEUR DE CLIC GLOBAL (INDÉSTRUCTIBLE POUR MOBILE & PC) ===
+document.addEventListener('DOMContentLoaded', () => {
+  // On applique le système dès que la page est chargée
+  restaurerPartie();
+
+  // On écoute le clic/tapotement sur TOUT le document
+  document.addEventListener('click', (e) => {
+    // Si l'élément cliqué est un département trouvé (vert)
+    if (e.target && e.target.classList.contains('found')) {
+      const num = e.target.getAttribute('data-num');
+      
+      // Sécurité si le data-num n'était pas encore lu, on extrait depuis l'ID (FR-01 -> 01)
+      const deptId = num || e.target.id.replace('FR-', '');
+      const deptInfo = DEPARTMENTS[deptId];
+      
+      if (deptInfo) {
+        // On récupère tes éléments de l'écran pour afficher le résultat
+        const box = document.getElementById('result-box');
+        const icon = document.getElementById('result-icon');
+        const name = document.getElementById('result-name');
+        const region = document.getElementById('result-region');
+        
+        if (box) {
+          box.className = 'result-box show correct';
+          if (icon) icon.textContent = '🗺️';
+          if (name) name.textContent = `${deptId} — ${deptInfo.name}`;
+          if (region) region.textContent = ' ' + deptInfo.region;
+        }
+        
+        // Petit effet de flash rapide sur le département cliqué pour valider l'action
+        e.target.classList.add('highlight');
+        setTimeout(() => e.target.classList.remove('highlight'), 300);
+      }
+    }
+  });
+});
+    
 
 function updateScores() {
   const f = found.size;

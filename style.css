@@ -899,7 +899,12 @@ header::after {
   }
 }
 
-/* Change le curseur en petite main quand on survole un département trouvé */
+/* Force la carte à accepter les clics du doigt */
+svg path {
+  pointer-events: auto !important;
+}
+
+/* Donne un indice visuel (curseur main) sur PC pour les zones trouvées */
 path.found {
   cursor: pointer !important;
 }
