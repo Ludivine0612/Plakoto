@@ -868,17 +868,30 @@ header::after {
 
 @media (max-width: 600px) {
   header {
-    /* On remplace le drapeau tricolore par un fond blanc uni sur mobile */
-    background: #ffffff !important;
-    padding: 15px 20px !important;
-    height: auto !important;
-    border-bottom: 3px solid #00209b !important; /* Une jolie ligne bleue pour rappeler le thème */
+    /* On restaure et force le drapeau tricolore en fond */
+    background: linear-gradient(to right, #00209b 33.33%, #ffffff 33.33%, #ffffff 66.66%, #d8001d 66.66%) !important;
+    height: 75px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   header h1 {
-    font-size: 26px !important;
+    /* Taille réduite pour tenir parfaitement dans la bande blanche sur mobile */
+    font-size: 19px !important; 
+    font-weight: 800 !important;
     color: #00209b !important;
     line-height: 1.2 !important;
+    
+    /* On resserre très légèrement les lettres pour gagner les pixels manquants */
+    letter-spacing: -0.5px !important; 
+    
+    /* On s'assure que le texte reste confiné au tiers central (la zone blanche) */
+    width: 33.33% !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    white-space: nowrap !important;
   }
 
   header p {
