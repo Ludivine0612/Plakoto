@@ -310,22 +310,64 @@ window.addEventListener('load', () => {
   });
 });
 
-// GESTION DU CLAVIER
-const deplacementInput = document.getElementById('dept-input');
-if (deplacementInput) {
-  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-  if (isTouchDevice) {
-    deplacementInput.setAttribute('inputmode', 'none');
-    deplacementInput.addEventListener('focus', (e) => e.preventDefault());
-  } else {
-    deplacementInput.removeAttribute('inputmode');
-    window.addEventListener('DOMContentLoaded', () => {
-      deplacementInput.focus();
-    });
-    document.addEventListener('click', (e) => {
-      if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
-        deplacementInput.focus();
+// === FONCTION POUR ACTIVER LES CLICS DIRECTEMENT SUR LA CARTE ===
+function activerClicsSurCarte(svgDocument) {
+  if (!svgDocument) return;
+
+  // On écoute le clic directement dans le document du SVG
+  svgDocument.addEventListener('click', (e) => {
+    // Si la zone cliquée est un département trouvé (vert)
+    if (e.target && e.target.classList.contains('found')) {
+      const num = e.target.getAttribute('data-num');
+      const deptId = num || e.target.id.replace('FR-', '');
+      const deptInfo = DEPARTMENTS[deptId];
+      
+      if (deptInfo) {
+        // IMPORTANT : On cherche la boîte de texte dans la page principale (window.parent ou document)
+        const docPrincipal = window.document;
+        const box = docPrincipal.getElementById('result-box');
+        const icon = docPrincipal.getElementById('result-icon');
+        const name = docPrincipal.getElementById('result-name');
+        const region = docPrincipal.getElementById('result-region');
+        
+        if (box) {
+          box.className = 'result-box show correct';
+          if (icon) icon.textContent = '🗺️';
+          if (name) name.textContent = `${deptId} — ${deptInfo.name}`;
+          if (region) region.textContent = ' ' + deptInfo.region;
+        }
+        
+        // Petit effet de flash visuel
+        e.target.classList.add('highlight');
+        setTimeout(() => e.target.classList.remove('highlight'), 300);
       }
-    });
-  }
+    }
+  });
 }
+
+// === INITIALISATION GLOBALE AU CHARGEMENT ===
+window.addEventListener('load', () => {
+  // 1. On restaure d'abord la partie (applique le vert sur la carte)
+  restaurerPartie();
+
+  // 2. ÉCOUTEUR PRINCIPAL (si le SVG est directement écrit au milieu du HTML)
+  activerClicsSurCarte(document);
+
+  // 3. ÉCOUTEUR SECONDAIRE (si ta carte utilise une balise <object id="..." data="carte.svg">)
+  // Remplace 'map' par l'ID de ta balise <object> si tu en as un !
+  const objetSvg = document.getElementById('map') || document.querySelector('object');
+  if (objetSvg) {
+    objetSvg.addEventListener('load', () => {
+      const svgInterne = objetSvg.contentDocument;
+      activerClicsSurCarte(svgInterne);
+    });
+    // Si l'objet était déjà chargé entre-temps
+    try {
+      if (objetSvg.contentDocument) {
+        activerClicsSurCarte(objetSvg.contentDocument);
+      }
+    } catch(err) {
+      console.log("Le SVG est sur un autre domaine ou inaccessible");
+    }
+  }
+});
