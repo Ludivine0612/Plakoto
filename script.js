@@ -105,7 +105,6 @@ const DEPARTMENTS = {
 const TOTAL = Object.keys(DEPARTMENTS).length; // 101
 let streak = 0;
 
-// INITIALISATION DU JEU AVEC CHARGEMENT DE LA SAUVEGARDE
 const savedData = localStorage.getItem('jeuDepartements_sauvegarde');
 let found = savedData ? new Set(JSON.parse(savedData)) : new Set();
 
@@ -120,7 +119,6 @@ function pad(val) {
   if (val === 'del') {
     input.value = input.value.slice(0, -1);
   } else if (val === 'clear') {
-    // Si la plaque est vide et qu'on clique sur ✕, on propose de réinitialiser tout le jeu
     if (input.value === '') {
       reinitialiserJeu();
     } else {
@@ -134,9 +132,7 @@ function pad(val) {
 
 function lookupDept(raw) {
   const up = raw.trim().toUpperCase();
-  // Direct match (e.g. "2A", "971")
   if (DEPARTMENTS[up]) return [up, DEPARTMENTS[up]];
-  // Zero-padded two-digit (e.g. "1" -> "01")
   const padded = up.padStart(2, '0');
   if (DEPARTMENTS[padded]) return [padded, DEPARTMENTS[padded]];
   return null;
@@ -152,27 +148,30 @@ function validate() {
   const name = document.getElementById('result-name');
   const region = document.getElementById('result-region');
 
-  box.className = 'result-box show';
+  if (box) box.className = 'result-box show';
 
   if (result) {
     const [key, dept] = result;
     if (found.has(key)) {
-      icon.textContent = '⚠️';
-      name.textContent = dept.name + ' — déjà trouvé !';
-      region.textContent = dept.region;
-      box.classList.remove('correct');
-      box.classList.add('wrong');
+      if (icon) icon.textContent = '⚠️';
+      if (name) name.textContent = dept.name + ' — déjà trouvé !';
+      if (region) region.textContent = dept.region;
+      if (box) {
+        box.classList.remove('correct');
+        box.classList.add('wrong');
+      }
       streak = 0;
     } else {
       found.add(key);
-      icon.textContent = '✅';
-      name.textContent = dept.name;
-      region.textContent = ' ' + dept.region;
-      box.classList.remove('wrong');
-      box.classList.add('correct');
+      if (icon) icon.textContent = '✅';
+      if (name) name.textContent = dept.name;
+      if (region) region.textContent = ' ' + dept.region;
+      if (box) {
+        box.classList.remove('wrong');
+        box.classList.add('correct');
+      }
       streak++;
       
-      // Sauvegarder immédiatement la nouvelle liste dans la mémoire locale
       localStorage.setItem('jeuDepartements_sauvegarde', JSON.stringify(Array.from(found)));
       
       addChip(key, dept.name);
@@ -181,23 +180,25 @@ function validate() {
     }
     highlightMap(key);
   } else {
-    icon.textContent = '❌';
-    name.textContent = 'Numéro inconnu : ' + raw;
-    region.textContent = 'Vérifie le numéro sur la plaque !';
-    box.classList.remove('correct');
-    box.classList.add('wrong');
+    if (icon) icon.textContent = '❌';
+    if (name) name.textContent = 'Numéro inconnu : ' + raw;
+    if (region) region.textContent = 'Vérifie le numéro sur la plaque !';
+    if (box) {
+      box.classList.remove('correct');
+      box.classList.add('wrong');
+    }
     streak = 0;
   }
 
   input.value = '';
 }
 
-// FUNCTION HIGHLIGHTMAP SÉCURISÉE
+// APPLICATION DU VERT ET CONFIGURATION DE LA CLIQUE
 function highlightMap(deptId) {
   const path = document.getElementById(`FR-${deptId}`);
   if (path) {
     path.classList.add('found');
-    path.setAttribute('data-num', deptId); // Stocke le numéro
+    path.setAttribute('data-num', deptId); // Stocke de manière sécurisée le numéro
     
     path.classList.add('highlight');
     setTimeout(() => {
@@ -206,11 +207,11 @@ function highlightMap(deptId) {
   }
 }
 
-// RESTAURATION DE LA PARTIE
+// UNE SEULE ET UNIQUE FONCTION DE RESTAURATION (CORRIGÉE)
 function restaurerPartie() {
   if (found.size > 0) {
     found.forEach(key => {
-      highlightMap(key);
+      highlightMap(key); // Applique la classe "found" ET le "data-num"
       if (DEPARTMENTS[key]) {
         addChip(key, DEPARTMENTS[key].name);
       }
@@ -219,57 +220,24 @@ function restaurerPartie() {
   }
 }
 
-// === L'ÉCOUTEUR DE CLIC GLOBAL (INDÉSTRUCTIBLE POUR MOBILE & PC) ===
-document.addEventListener('DOMContentLoaded', () => {
-  // On applique le système dès que la page est chargée
-  restaurerPartie();
-
-  // On écoute le clic/tapotement sur TOUT le document
-  document.addEventListener('click', (e) => {
-    // Si l'élément cliqué est un département trouvé (vert)
-    if (e.target && e.target.classList.contains('found')) {
-      const num = e.target.getAttribute('data-num');
-      
-      // Sécurité si le data-num n'était pas encore lu, on extrait depuis l'ID (FR-01 -> 01)
-      const deptId = num || e.target.id.replace('FR-', '');
-      const deptInfo = DEPARTMENTS[deptId];
-      
-      if (deptInfo) {
-        // On récupère tes éléments de l'écran pour afficher le résultat
-        const box = document.getElementById('result-box');
-        const icon = document.getElementById('result-icon');
-        const name = document.getElementById('result-name');
-        const region = document.getElementById('result-region');
-        
-        if (box) {
-          box.className = 'result-box show correct';
-          if (icon) icon.textContent = '🗺️';
-          if (name) name.textContent = `${deptId} — ${deptInfo.name}`;
-          if (region) region.textContent = ' ' + deptInfo.region;
-        }
-        
-        // Petit effet de flash rapide sur le département cliqué pour valider l'action
-        e.target.classList.add('highlight');
-        setTimeout(() => e.target.classList.remove('highlight'), 300);
-      }
-    }
-  });
-});
-    
-
 function updateScores() {
   const f = found.size;
-  document.getElementById('found-count-badge').textContent = f;
+  const badge = document.getElementById('found-count-badge');
+  const bar = document.getElementById('progress-bar');
+  const label = document.getElementById('progress-label');
+  
+  if (badge) badge.textContent = f;
   const pct = Math.round((f / TOTAL) * 100);
-  document.getElementById('progress-bar').style.width = pct + '%';
-  document.getElementById('progress-label').textContent = f + ' / ' + TOTAL + ' départements';
+  if (bar) bar.style.width = pct + '%';
+  if (label) label.textContent = f + ' / ' + TOTAL + ' départements';
 }
 
 function addChip(key, name) {
   const chip = document.createElement('div');
   chip.className = 'found-chip';
   chip.innerHTML = `<span class="num">${key}</span> ${name}`;
-  document.getElementById('found-list').prepend(chip);
+  const list = document.getElementById('found-list');
+  if (list) list.prepend(chip);
 }
 
 function celebrate() {
@@ -293,69 +261,68 @@ function launchConfetti() {
   }
 }
 
-// RESTAURATION DE LA PARTIE ENREGISTRÉE AU CHARGEMENT DE LA PAGE
-function restaurerPartie() {
-  if (found.size > 0) {
-    found.forEach(key => {
-      // 1. Colorer la carte
-      const path = document.getElementById(`FR-${key}`);
-      if (path) path.classList.add('found');
-      
-      // 2. Recréer les badges (chips) en bas
-      if (DEPARTMENTS[key]) {
-        addChip(key, DEPARTMENTS[key].name);
-      }
-    });
-    // 3. Mettre à jour les scores et la barre
-    updateScores();
-  }
-}
-
-// Ouvre la boîte de dialogue personnalisée
 function reinitialiserJeu() {
   const modal = document.getElementById('reset-modal');
   if (modal) modal.classList.add('show');
 }
 
-// Ferme la boîte de dialogue si on clique sur annuler
 function fermerModalReset() {
   const modal = document.getElementById('reset-modal');
   if (modal) modal.classList.remove('show');
 }
 
-// S'exécute si on clique sur "Oui, effacer"
 function confirmerResetTotal() {
   localStorage.removeItem('jeuDepartements_sauvegarde');
   found.clear();
-  location.reload(); // Recharge l'application à zéro
+  location.reload();
 }
 
-// On démarre la restauration automatique dès que le script se lance
-restaurerPartie();
+// === GESTIONNAIRE D'ÉVÉNEMENTS GLOBAL POUR LE CLIC (PC & ÉCRANS TACTILES) ===
+window.addEventListener('load', () => {
+  // Lance la restauration une fois que TOUTE la page (et le SVG de la carte) est chargée à 100%
+  restaurerPartie();
 
-// GESTION INTELLIGENTE DU CLAVIER (PC VS SMARTPHONE)
+  // Écoute les clics et tapotements tactiles sur tout le document
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.classList.contains('found')) {
+      const num = e.target.getAttribute('data-num');
+      const deptId = num || e.target.id.replace('FR-', '');
+      const deptInfo = DEPARTMENTS[deptId];
+      
+      if (deptInfo) {
+        const box = document.getElementById('result-box');
+        const icon = document.getElementById('result-icon');
+        const name = document.getElementById('result-name');
+        const region = document.getElementById('result-region');
+        
+        if (box) {
+          box.className = 'result-box show correct';
+          if (icon) icon.textContent = '🗺️';
+          if (name) name.textContent = `${deptId} — ${deptInfo.name}`;
+          if (region) region.textContent = ' ' + deptInfo.region;
+        }
+        
+        // Petit effet flash rapide au toucher
+        e.target.classList.add('highlight');
+        setTimeout(() => e.target.classList.remove('highlight'), 300);
+      }
+    }
+  });
+});
+
+// GESTION DU CLAVIER
 const deplacementInput = document.getElementById('dept-input');
-
 if (deplacementInput) {
-  // Détection : si l'appareil a un écran tactile (Smartphone/Tablette)
   const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-
   if (isTouchDevice) {
-    // Sur MOBILE : on force inputmode à "none" pour bloquer le clavier natif
     deplacementInput.setAttribute('inputmode', 'none');
     deplacementInput.addEventListener('focus', (e) => e.preventDefault());
   } else {
-    // Sur PC : on redonne le contrôle au clavier physique
     deplacementInput.removeAttribute('inputmode');
-    
-    // On force la mise au point automatique (focus) sur la plaque pour pouvoir taper direct
     window.addEventListener('DOMContentLoaded', () => {
       deplacementInput.focus();
     });
-    
-    // Sécurité : si l'utilisateur clique ailleurs, on lui permet de retaper directement dans la plaque
     document.addEventListener('click', (e) => {
-      // Si on ne clique pas sur un bouton du pavé ou une autre zone interactive, on remet le focus sur la plaque
       if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
         deplacementInput.focus();
       }
