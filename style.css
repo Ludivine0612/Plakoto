@@ -908,3 +908,11 @@ svg path {
 path.found {
   cursor: pointer !important;
 }
+
+/* Style pour le département sélectionné depuis la liste du bas */
+.selected-blue {
+  fill: #00209b !important; /* Le beau bleu du drapeau français */
+  stroke: #ffffff !important; /* Une bordure blanche pour bien le détacher des autres */
+  stroke-width: 2px !important;
+  transition: fill 0.3s ease !important;
+}

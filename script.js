@@ -235,7 +235,30 @@ function updateScores() {
 function addChip(key, name) {
   const chip = document.createElement('div');
   chip.className = 'found-chip';
+  chip.style.cursor = 'pointer'; // Indique que le badge est cliquable
   chip.innerHTML = `<span class="num">${key}</span> ${name}`;
+  
+  // === AJOUT : Clic sur le badge pour colorer le département en bleu ===
+  chip.addEventListener('click', () => {
+    // 1. On commence par enlever la couleur bleue de n'importe quel autre département précédemment cliqué
+    document.querySelectorAll('.selected-blue').forEach(el => {
+      el.classList.remove('selected-blue');
+    });
+
+    // 2. On cherche le département correspondant sur la carte
+    const path = document.getElementById(`FR-${key}`);
+    if (path) {
+      // 3. On lui ajoute la classe bleue
+      path.classList.add('selected-blue');
+      
+      // 4. Optionnel : On fait un petit effet de défilement automatique vers la carte pour bien la voir
+      const carteElement = document.getElementById('map') || document.querySelector('svg');
+      if (carteElement) {
+        carteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  });
+
   const list = document.getElementById('found-list');
   if (list) list.prepend(chip);
 }
