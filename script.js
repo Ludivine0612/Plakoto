@@ -200,6 +200,30 @@ function highlightMap(deptId) {
     // Ajouter la classe "found" pour le peindre en vert
     path.classList.add('found');
     
+    // AJOUT : Écrire le numéro au centre du département si ce n'est pas déjà fait
+    const textId = `text-FR-${deptId}`;
+    if (!document.getElementById(textId)) {
+      try {
+        // Calcule automatiquement le centre géométrique du département
+        const box = path.getBBox();
+        const x = box.x + box.width / 2;
+        const y = box.y + box.height / 2;
+        
+        // Crée une balise de texte spéciale pour le SVG
+        const textSvg = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        textSvg.setAttribute("id", textId);
+        textSvg.setAttribute("x", x);
+        textSvg.setAttribute("y", y);
+        textSvg.setAttribute("class", "numero-carte-style");
+        textSvg.textContent = deptId; // Écrit le numéro (ex: "01", "2A")
+        
+        // Insère le numéro juste au-dessus du département sur la carte
+        path.parentNode.appendChild(textSvg);
+      } catch (e) {
+        console.log("Impossible de calculer le centre pour le département " + deptId);
+      }
+    }
+    
     // Ajouter un flash temporaire "highlight" (jaune)
     path.classList.add('highlight');
     setTimeout(() => {
