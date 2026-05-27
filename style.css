@@ -899,13 +899,7 @@ header::after {
   }
 }
 
-/* Style pour les numéros affichés sur la carte */
-.numero-carte-style {
-  font-family: 'Nunito', sans-serif !important;
-  font-size: 7px !important; /* Très petit pour ne pas déborder */
-  font-weight: 800 !important;
-  fill: #ffffff !important; /* Texte blanc pour ressortir sur le vert */
-  text-anchor: middle !important; /* Centre horizontalement */
-  dominant-baseline: central !important; /* Centre verticalement */
-  pointer-events: none !important; /* Empêche le texte de bloquer les clics */
+/* Change le curseur en petite main quand on survole un département trouvé */
+path.found {
+  cursor: pointer !important;
 }

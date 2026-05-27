@@ -197,34 +197,38 @@ function highlightMap(deptId) {
   const path = document.getElementById(`FR-${deptId}`);
   
   if (path) {
-    // Ajouter la classe "found" pour le peindre en vert
     path.classList.add('found');
     
-    // AJOUT : Écrire le numéro au centre du département si ce n'est pas déjà fait
-    const textId = `text-FR-${deptId}`;
-    if (!document.getElementById(textId)) {
-      try {
-        // Calcule automatiquement le centre géométrique du département
-        const box = path.getBBox();
-        const x = box.x + box.width / 2;
-        const y = box.y + box.height / 2;
-        
-        // Crée une balise de texte spéciale pour le SVG
-        const textSvg = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        textSvg.setAttribute("id", textId);
-        textSvg.setAttribute("x", x);
-        textSvg.setAttribute("y", y);
-        textSvg.setAttribute("class", "numero-carte-style");
-        textSvg.textContent = deptId; // Écrit le numéro (ex: "01", "2A")
-        
-        // Insère le numéro juste au-dessus du département sur la carte
-        path.parentNode.appendChild(textSvg);
-      } catch (e) {
-        console.log("Impossible de calculer le centre pour le département " + deptId);
-      }
-    }
+    // AJOUT : On stocke les infos pour pouvoir les récupérer au clic
+    path.setAttribute('data-num', deptId);
     
-    // Ajouter un flash temporaire "highlight" (jaune)
+    // AJOUT : Gestion du clic/tapotement du doigt sur mobile et PC
+    path.onclick = function() {
+      // On vérifie si ce département a bien été trouvé
+      if (path.classList.contains('found')) {
+        const num = path.getAttribute('data-num');
+        const deptInfo = DEPARTMENTS[num];
+        
+        if (deptInfo) {
+          // On utilise ta boîte de résultat existante pour afficher l'info !
+          const box = document.getElementById('result-box');
+          const icon = document.getElementById('result-icon');
+          const name = document.getElementById('result-name');
+          const region = document.getElementById('result-region');
+          
+          box.className = 'result-box show correct';
+          icon.textContent = '🗺️';
+          name.textContent = `${num} — ${deptInfo.name}`;
+          region.textContent = ' ' + deptInfo.region;
+          
+          // Petit effet visuel : fait clignoter rapidement le département cliqué
+          path.classList.add('highlight');
+          setTimeout(() => path.classList.remove('highlight'), 500);
+        }
+      }
+    };
+    
+    // Flash jaune temporaire à la validation initiale
     path.classList.add('highlight');
     setTimeout(() => {
       path.classList.remove('highlight');
